@@ -1,0 +1,15 @@
+{
+  "name": "addressbook-backend",
+  "version": "1.0.0",
+  "description": "Address Book Management System - Express + SQLite backend",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.22.3"
+  }
+}

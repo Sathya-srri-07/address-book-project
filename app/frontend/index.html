@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Address Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="drawer-label">
+  <div class="label-text">
+    <h1>The Address Book</h1>
+    <p id="countLine">Loading…</p>
+  </div>
+  <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light/dark theme">◐</button>
+</div>
+
+<div class="toolbar">
+  <button class="tbtn" id="filterAll" type="button">all</button>
+  <button class="tbtn" id="filterFav" type="button">★ favorites</button>
+  <select id="sortSelect" aria-label="Sort contacts">
+    <option value="name-asc">name A–Z</option>
+    <option value="name-desc">name Z–A</option>
+    <option value="recent">recently added</option>
+  </select>
+  <span class="spacer"></span>
+  <button class="tbtn" id="exportBtn" type="button">export .json</button>
+  <button class="tbtn" id="importBtn" type="button">import .json</button>
+  <input type="file" id="importFile" accept="application/json">
+</div>
+
+<div class="catalog">
+  <nav class="index" aria-label="Contact index">
+    <div class="index-search">
+      <input type="text" id="searchInput" class="mono" placeholder="find a name, phone, or email…" aria-label="Search contacts">
+    </div>
+    <div id="indexList"></div>
+    <button class="new-card-btn" id="newCardBtn" type="button">+ file a new card</button>
+  </nav>
+
+  <main class="stage" id="stage">
+    <div class="empty-stage">
+      <p>NO CARD SELECTED</p>
+      <div>Pick a name from the drawer, or file a new card to begin.</div>
+    </div>
+  </main>
+</div>
+
+<div class="toast mono" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Address Book Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2ecda; --paper-2: #ece3ca; --card: #faf6e8;
+    --rule: #cdbd8f; --ink: #2c2820; --ink-soft: #6b6250;
+    --tab-green: #33513f; --tab-green-ink: #eef3ee;
+    --tab-red: #8c3b2e; --brass: #a07d2b; --focus: #33513f;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1d1b16; --paper-2: #24211a; --card: #29261e;
+      --rule: #4a4433; --ink: #ece4cf; --ink-soft: #a89f89;
+      --tab-green: #4d7a5f; --tab-green-ink: #10140f; --tab-red: #b5584a; --brass: #c9a247;
+    }
+  }
+  :root[data-theme="dark"] {
+      --paper: #1d1b16; --paper-2: #24211a; --card: #29261e;
+      --rule: #4a4433; --ink: #ece4cf; --ink-soft: #a89f89;
+      --tab-green: #4d7a5f; --tab-green-ink: #10140f; --tab-red: #b5584a; --brass: #c9a247;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'Courier Prime', 'Courier New', monospace; }
+  a { color: inherit; }
+  img, svg { max-width: 100%; }
+  h1, h2, h3 { font-weight: 700; margin: 0 0 0.4em; }
+  section { padding: 76px 24px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .kicker {
+    font-family: 'Courier Prime', monospace; font-size: 0.75rem; letter-spacing: 0.1em;
+    color: var(--brass); margin-bottom: 10px;
+  }
+
+  /* ---- Nav ---- */
+  header.site-nav {
+    position: sticky; top: 0; z-index: 20; background: var(--paper);
+    border-bottom: 2px solid var(--rule);
+  }
+  .nav-row { max-width: 980px; margin: 0 auto; display: flex; align-items: center;
+    justify-content: space-between; padding: 14px 24px; }
+  .brand { font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+  .brand .mark { color: var(--tab-green); font-size: 1.2rem; }
+  nav.links { display: flex; gap: 22px; font-family: 'Courier Prime', monospace; font-size: 0.8rem; }
+  nav.links a { text-decoration: none; color: var(--ink-soft); }
+  nav.links a:hover { color: var(--ink); }
+  .nav-cta {
+    font-family: 'Courier Prime', monospace; font-size: 0.78rem; padding: 8px 14px;
+    background: var(--tab-green); color: var(--tab-green-ink); border-radius: 3px; text-decoration: none;
+  }
+  .theme-btn { border: 1px solid var(--rule); background: var(--card); color: var(--ink);
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer; margin-left: 14px; }
+  .mobile-toggle { display: none; background: none; border: 1px solid var(--rule); border-radius: 3px;
+    width: 36px; height: 32px; color: var(--ink); cursor: pointer; }
+
+  /* ---- Hero ---- */
+  .hero { padding: 84px 24px 60px; }
+  .hero-grid { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 1.15fr 0.85fr;
+    gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(2.1rem, 4.2vw, 3.1rem); letter-spacing: -0.01em; }
+  .hero p.lead { font-size: 1.12rem; color: var(--ink-soft); max-width: 46ch; margin: 14px 0 28px; }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    font-family: 'Courier Prime', monospace; font-size: 0.85rem; padding: 12px 20px;
+    border-radius: 3px; border: 1px solid var(--rule); text-decoration: none; display: inline-block;
+    color: var(--ink); background: transparent;
+  }
+  .btn.primary { background: var(--tab-green); border-color: var(--tab-green); color: var(--tab-green-ink); }
+  .btn:hover { border-color: var(--brass); }
+  .btn.primary:hover { filter: brightness(1.08); }
+
+  .mock-card {
+    background: var(--card); border: 1px solid var(--rule); border-radius: 4px;
+    box-shadow: 6px 6px 0 var(--rule); padding: 22px 24px; transform: rotate(-1.4deg);
+    font-family: 'Courier Prime', monospace; font-size: 0.85rem;
+  }
+  .mock-card .mline { border-bottom: 1px solid var(--rule); padding-bottom: 8px; margin-bottom: 12px; }
+  .mock-card label { display: block; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 3px; }
+  .mock-star { color: var(--brass); float: right; }
+
+  /* ---- Stat strip ---- */
+  .strip { border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule); background: var(--paper-2); padding: 34px 24px; }
+  .strip .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 22px; text-align: center; }
+  .stat b { display: block; font-size: 1.7rem; }
+  .stat span { font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: var(--ink-soft); letter-spacing: 0.06em; }
+
+  /* ---- Features ---- */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--rule);
+    border: 2px solid var(--rule); margin-top: 30px; }
+  .feature { background: var(--card); padding: 24px 22px; }
+  .feature .tag {
+    font-family: 'Courier Prime', monospace; font-size: 0.68rem; color: var(--tab-green-ink);
+    background: var(--tab-green); display: inline-block; padding: 2px 8px; border-radius: 2px; margin-bottom: 12px;
+  }
+  .feature h3 { font-size: 1.05rem; }
+  .feature p { color: var(--ink-soft); font-size: 0.94rem; margin: 6px 0 0; }
+
+  /* ---- Architecture ---- */
+  .arch-diagram { margin-top: 34px; display: flex; align-items: center; justify-content: center;
+    gap: 0; flex-wrap: wrap; font-family: 'Courier Prime', monospace; font-size: 0.82rem; }
+  .arch-box { border: 1.5px solid var(--rule); background: var(--card); padding: 14px 18px; border-radius: 3px;
+    text-align: center; min-width: 140px; }
+  .arch-box b { display: block; font-family: 'Source Serif 4', serif; font-size: 1rem; margin-bottom: 3px; }
+  .arch-box span { color: var(--ink-soft); font-size: 0.72rem; }
+  .arch-arrow { color: var(--brass); font-size: 1.3rem; padding: 0 14px; }
+  .arch-below { text-align: center; margin-top: 18px; }
+
+  /* ---- Two-column tech ---- */
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 30px; }
+  .tech-card { border: 1px solid var(--rule); background: var(--card); border-radius: 4px; padding: 24px; }
+  .tech-card h3 { font-size: 1.08rem; }
+  .tech-card ul { margin: 12px 0 0; padding-left: 20px; color: var(--ink-soft); font-size: 0.92rem; }
+  .tech-card li { margin-bottom: 5px; }
+  .tech-card .pill {
+    display: inline-block; font-family: 'Courier Prime', monospace; font-size: 0.68rem;
+    border: 1px solid var(--rule); padding: 2px 8px; border-radius: 20px; margin: 2px 4px 0 0; color: var(--ink-soft);
+  }
+
+  /* ---- Team ---- */
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 30px; }
+  .team-card { border: 1px solid var(--rule); border-radius: 4px; padding: 20px 16px; text-align: center; background: var(--card); }
+  .team-card .initials {
+    width: 46px; height: 46px; border-radius: 50%; background: var(--tab-green); color: var(--tab-green-ink);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-family: 'Courier Prime', monospace; font-size: 0.85rem;
+  }
+  .team-card h4 { margin: 0 0 2px; font-size: 0.98rem; }
+  .team-card span { font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: var(--ink-soft); }
+
+  /* ---- Footer ---- */
+  footer { border-top: 3px double var(--rule); padding: 30px 24px; background: var(--paper-2); }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  footer p { margin: 0; font-family: 'Courier Prime', monospace; font-size: 0.78rem; color: var(--ink-soft); }
+
+  @media (max-width: 860px) {
+    nav.links, .nav-cta.desktop-only { display: none; }
+    .mobile-toggle { display: inline-block; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .mock-card { transform: none; max-width: 360px; margin: 0 auto; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr 1fr; }
+    .strip .wrap { justify-content: center; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { animation: rise 0.5s ease-out both; }
+    @keyframes rise { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-row">
+    <div class="brand"><span class="mark">&#128209;</span> Address Book</div>
+    <nav class="links">
+      <a href="#features">Features</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#tech">Tech</a>
+      <a href="#team">Team</a>
+    </nav>
+    <div>
+      <a class="nav-cta desktop-only" href="https://claude.ai/artifact/BdHDENHz3NmfWTP2on2KuU" target="_blank" rel="noopener">Open the app</a>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9680;</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <p class="kicker">A TEAM PROJECT &middot; C++ &amp; WEB</p>
+      <h1>Every contact, filed exactly where you'd expect it.</h1>
+      <p class="lead">A contact manager built two ways: a fast C++ console program for the core logic, and a card-catalog styled web app for everyday use. Add, search, edit, sort, and never lose a card again.</p>
+      <div class="hero-ctas">
+        <a class="btn primary" href="https://claude.ai/artifact/BdHDENHz3NmfWTP2on2KuU" target="_blank" rel="noopener">Open the web app</a>
+        <a class="btn" href="#features">See what it does</a>
+      </div>
+    </div>
+    <div class="mock-card reveal">
+      <div class="mline">
+        <label>NAME</label>Priya Anand<span class="mock-star">&#9733;</span>
+      </div>
+      <div class="mline"><label>PHONE</label>+91 98765 43210</div>
+      <div class="mline"><label>EMAIL</label>priya@example.com</div>
+      <div><label>ADDRESS</label>14 MG Road, Vizag</div>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="wrap">
+    <div class="stat"><b>2</b><span>PLATFORMS BUILT</span></div>
+    <div class="stat"><b>7+</b><span>CORE OPERATIONS</span></div>
+    <div class="stat"><b>4</b><span>MODULES, 4 OWNERS</span></div>
+    <div class="stat"><b>0</b><span>DUPLICATE CONTACTS</span></div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <p class="kicker">FEATURES</p>
+    <h2>Everything a contact list needs, nothing it doesn't.</h2>
+    <div class="feature-grid">
+      <div class="feature"><span class="tag">ADD</span><h3>Guided entry</h3><p>Name, phone, email, address, and notes — validated as you type, with duplicates caught before they're saved.</p></div>
+      <div class="feature"><span class="tag">FIND</span><h3>Instant search</h3><p>Filter by name, phone, or email as you type, grouped alphabetically like a real card drawer.</p></div>
+      <div class="feature"><span class="tag">EDIT</span><h3>Edit in place</h3><p>Open any card, change what's needed, save — no separate edit screen to get lost in.</p></div>
+      <div class="feature"><span class="tag">SORT</span><h3>Sort &amp; favorite</h3><p>A–Z, Z–A, or most recent, plus a star for the contacts you reach for most.</p></div>
+      <div class="feature"><span class="tag">MOVE</span><h3>Import &amp; export</h3><p>Back up the whole book as JSON, or hand off one card as a standard .vcf file.</p></div>
+      <div class="feature"><span class="tag">KEEP</span><h3>Never lose data</h3><p>The C++ version writes to disk on every change; the web app autosaves locally the same way.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <p class="kicker">ARCHITECTURE</p>
+    <h2>Four modules, one clear job each.</h2>
+    <div class="arch-diagram">
+      <div class="arch-box"><b>Contact</b><span>data model</span></div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-box"><b>AddressBook</b><span>logic + storage</span></div>
+      <div class="arch-arrow">&rarr;</div>
+      <div class="arch-box"><b>main</b><span>menu / UI</span></div>
+    </div>
+    <div class="arch-below">
+      <div class="arch-box" style="display:inline-block;"><b>Validator</b><span>used by both sides</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="tech">
+  <div class="wrap">
+    <p class="kicker">UNDER THE HOOD</p>
+    <h2>Two builds, one shared design.</h2>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <h3>Console application</h3>
+        <ul>
+          <li>C++17, compiled with g++</li>
+          <li>Contacts saved to a plain text file</li>
+          <li>Menu-driven, keyboard only</li>
+        </ul>
+        <div style="margin-top:14px;">
+          <span class="pill">C++17</span><span class="pill">STL</span><span class="pill">File I/O</span>
+        </div>
+      </div>
+      <div class="tech-card">
+        <h3>Web application</h3>
+        <ul>
+          <li>Single-file HTML, CSS &amp; vanilla JS</li>
+          <li>Autosaves to the browser's local storage</li>
+          <li>Works offline once loaded, no server needed</li>
+        </ul>
+        <div style="margin-top:14px;">
+          <span class="pill">HTML5</span><span class="pill">CSS3</span><span class="pill">JavaScript</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <p class="kicker">THE TEAM</p>
+    <h2>Four modules, four owners.</h2>
+    <div class="team-grid">
+      <div class="team-card"><div class="initials">C</div><h4>Contact</h4><span>data model &amp; storage format</span></div>
+      <div class="team-card"><div class="initials">V</div><h4>Validator</h4><span>input rules</span></div>
+      <div class="team-card"><div class="initials">A</div><h4>AddressBook</h4><span>core logic</span></div>
+      <div class="team-card"><div class="initials">M</div><h4>main / UI</h4><span>menu &amp; experience</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Address Book Management System &mdash; team project</p>
+    <p>Built with C++ and a plain HTML/CSS/JS front end</p>
+  </div>
+</footer>
+
+<script>
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(t) {
+    if (t) document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
+  }
+  try { const saved = localStorage.getItem('addressbook_site_theme'); if (saved) applyTheme(saved); } catch (e) {}
+  themeBtn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = !current ? (prefersDark ? 'light' : 'dark') : (current === 'dark' ? 'light' : 'dark');
+    applyTheme(next);
+    try { localStorage.setItem('addressbook_site_theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>
